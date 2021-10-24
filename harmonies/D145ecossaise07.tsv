@@ -1,0 +1,18 @@
+mc	mn	mc_onset	mn_onset	timesig	staff	voice	volta	label	globalkey	localkey	pedal	chord	numeral	form	figbass	changes	relativeroot	cadence	phraseend	chord_type	globalkey_is_minor	localkey_is_minor	chord_tones	added_tones	root	bass_note
+1	1	0	0	2/4	2	1		B.I	B	I		I	I							M	0	0	0, 4, 1		0	0
+1	1	1/8	1/8	2/4	2	1		V	B	I		V	V							M	0	0	1, 5, 2		1	1
+1	1	1/4	1/4	2/4	2	1		I	B	I		I	I							M	0	0	0, 4, 1		0	0
+2	2	0	0	2/4	2	1		I	B	I		I	I							M	0	0	0, 4, 1		0	0
+2	2	1/8	1/8	2/4	2	1		V	B	I		V	V							M	0	0	1, 5, 2		1	1
+2	2	1/4	1/4	2/4	2	1		I	B	I		I	I							M	0	0	0, 4, 1		0	0
+3	3	0	0	2/4	2	1		IV	B	I		IV	IV							M	0	0	-1, 3, 0		-1	-1
+4	4	0	0	2/4	2	1		bVI7	B	I		bVI7	bVI		7					Mm7	0	0	-4, 0, -3, -6		-4	-4
+4	4	1/4	1/4	2/4	2	1		I	B	I		I	I							M	0	0	0, 4, 1		0	0
+5	5	0	0	2/4	2	1		V7/bII	B	I		V7/bII	V		7		bII			Mm7	0	0	-4, 0, -3, -6		-4	-4
+5	5	1/4	1/4	2/4	2	1		bII	B	I		bII	bII							M	0	0	-5, -1, -4		-5	-5
+6	6	0	0	2/4	2	1		V7/bII	B	I		V7/bII	V		7		bII			Mm7	0	0	-4, 0, -3, -6		-4	-4
+6	6	1/4	1/4	2/4	2	1		bII	B	I		bII	bII							M	0	0	-5, -1, -4		-5	-5
+7	7	0	0	2/4	2	1		V7	B	I		V7	V		7					Mm7	0	0	1, 5, 2, -1		1	1
+7	7	1/4	1/4	2/4	2	1		I	B	I		I	I							M	0	0	0, 4, 1		0	0
+8	8	0	0	2/4	2	1		V7	B	I		V7	V		7					Mm7	0	0	1, 5, 2, -1		1	1
+8	8	1/4	1/4	2/4	2	1		I	B	I		I	I							M	0	0	0, 4, 1		0	0
