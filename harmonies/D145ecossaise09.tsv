@@ -6,7 +6,7 @@ mc	mn	mc_onset	mn_onset	timesig	staff	voice	volta	label	globalkey	localkey	pedal
 4	4	1/4	1/4	2/4	2	1		I	G	I		I	I							M	0	0	0, 4, 1		0	0
 5	5	0	0	2/4	2	1		IV	G	I		IV	IV							M	0	0	-1, 3, 0		-1	-1
 5	5	1/4	1/4	2/4	2	1		IV6	G	I		IV6	IV		6					M	0	0	3, 0, -1		-1	3
-6	6	0	0	2/4	2	1		viio43/V	G	I		viio43/V	vii	o	43		V			o7	0	0	0, -3, 6, 3		6	0
+6	6	0	0	2/4	2	1		I(#4#2)	G	I		I(#4#2)	I			#4#2				M	0	0	0, 9, 6		0	0
 6	6	1/4	1/4	2/4	2	1		I	G	I		I	I							M	0	0	0, 4, 1		0	0
 7	7	0	0	2/4	2	1		IV	G	I		IV	IV							M	0	0	-1, 3, 0		-1	-1
 7	7	1/4	1/4	2/4	2	1		viio65/V	G	I		viio65/V	vii	o	65		V			o7	0	0	3, 0, -3, 6		6	3

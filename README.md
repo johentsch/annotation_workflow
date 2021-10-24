@@ -13,4 +13,4 @@ The documentation for re-using the DCML annotation workflow can be found on http
 |D145ecossaise06|      16|     0|        |           |          |
 |D145ecossaise07|       8|    17|2.3.0   |Annotator A|Reviewer A|
 |D145ecossaise08|       8|     0|        |           |          |
-|D145ecossaise09|       8|     0|        |           |          |
+|D145ecossaise09|       8|    13|2.3.0   |Annotator B|johentsch |
