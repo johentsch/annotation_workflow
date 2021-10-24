@@ -162,6 +162,7 @@
     <metaTag name="mscVersion">3.02</metaTag>
     <metaTag name="platform">Linux</metaTag>
     <metaTag name="poet"></metaTag>
+    <metaTag name="reviewers">johentsch</metaTag>
     <metaTag name="source"></metaTag>
     <metaTag name="translator"></metaTag>
     <metaTag name="workNumber"></metaTag>
@@ -1315,7 +1316,7 @@
         <voice>
           <Harmony>
             <harmonyType>1</harmonyType>
-            <name>viio43/V</name>
+            <name>I(#4#2)</name>
             </Harmony>
           <Beam>
             <StemDirection>down</StemDirection>
