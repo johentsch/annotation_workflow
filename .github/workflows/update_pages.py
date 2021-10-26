@@ -139,8 +139,12 @@ def get_phraseends(at):
 
 
 def main(args):
-    p = Parse(args.dir, paths=args.file, file_re=args.regex, recursive=args.nonrecursive, logger_cfg=dict(level=args.level))
+    write_gantt_charts(args)
+
+def write_gantt_charts(args):
+    p = Parse(args.dir, paths=args.file, file_re=args.regex, exclude_re=args.exclude, recursive=args.nonrecursive, logger_cfg=dict(level=args.level))
     p.parse_mscx()
+    gantt_path = check_and_create('gantt') if args.out is None else check_and_create(os.path.join(args.out, 'gantt'))
     for (key, i, _), at in p.get_lists(expanded=True).items(): # at stands for annotation table, i.e. DataFrame of expanded labels
         fname = p.fnames[key][i]
         score_obj = p._parsed_mscx[(key, i)]
@@ -154,7 +158,7 @@ def main(args):
         data.sort_values(args.yaxis, ascending=False, inplace=True)
         logger.debug(f"Making and storing Gantt chart for {fname}...")
         fig = create_gantt(data, title=f"{fname} ({globalkey})", task_column=args.yaxis, lines=phrases)
-        out_path = f'gantt/{fname}.html' if args.out is None else os.path.join(args.out, f'gantt/{fname}.html')
+        out_path = os.path.join(gantt_path, f'{fname}.html')
         plot(fig, filename=out_path)
         logger.debug(f"Stored as {out_path}")
 
@@ -182,6 +186,7 @@ def check_and_create(d):
         d = resolve_dir(os.path.join(os.getcwd(), d))
         if not os.path.isdir(d):
             os.makedirs(d)
+            print(f"Created directory {d}")
     return resolve_dir(d)
 
 
@@ -212,6 +217,8 @@ Description goes here
     parser.add_argument('-n', '--nonrecursive', action='store_false', help="Don't scan folders recursively, i.e. parse only files in DIR.")
     parser.add_argument('-f', '--file', metavar='PATHs', nargs='+', help='Add path(s) of individual file(s) to be checked.')
     parser.add_argument('-r', '--regex', metavar="REGEX", default=r'\.mscx$', help="Select only file names including this string or regular expression. Defaults to MSCX files only.")
+    parser.add_argument('-e', '--exclude', metavar="regex", default=r'(^(\.|_)|_reviewed)', help="Any files or folders (and their subfolders) including this regex will be disregarded."
+                                     "By default, files including '_reviewed' or starting with . or _ are excluded.")
     parser.add_argument('-o', '--out', metavar='OUT_DIR', type=check_and_create, help="""Output directory.""")
     parser.add_argument('-y', '--yaxis', default='semitones', help="Ordering of keys on the y-axis: can be {semitones, fifths, numeral}.")
     parser.add_argument('-l','--level',default='INFO',help="Set logging to one of the levels {DEBUG, INFO, WARNING, ERROR, CRITICAL}.")
