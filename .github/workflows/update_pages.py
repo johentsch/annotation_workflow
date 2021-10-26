@@ -10,10 +10,12 @@ import plotly.figure_factory as ff
 
 INDEX_FNAME = 'index.md'
 GANTT_FNAME = 'gantt.md'
+JEKYLL_CFG_FNAME = '_config.yml'
+
 INDEX_FILE = f"""
 * [Modulation plans]({GANTT_FNAME})
 """
-
+JEKYLL_CFG_FILE = "theme: jekyll-theme-tactile "
 
 
 
@@ -149,6 +151,7 @@ def get_phraseends(at):
 def main(args):
     write_gantt_charts(args)
     write_to_file(args, INDEX_FNAME, INDEX_FILE)
+    write_to_file(args, JEKYLL_CFG_FNAME, JEKYLL_CFG_FILE)
     write_gantt_file(args)
 
 
