@@ -1244,6 +1244,7 @@
             <harmonyType>1</harmonyType>
             <name>I}</name>
             <color r="0" g="85" b="0" a="255"/>
+            <offset x="0.85263" y="3.5"/>
             </Harmony>
           <Chord>
             <BeamMode>mid</BeamMode>
