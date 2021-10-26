@@ -27,7 +27,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e ./ms3
-      - name: Install plotly
+      - name: Install dependencies
         run: |
           python -m pip install plotly
       - uses: lots0logs/gh-action-get-changed-files@2.1.4
@@ -35,6 +35,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Display changed files
         run: cat ${HOME}/files_modified.json
+      - name: Copy existing page
+        uses: actions/checkout@v2
+        with:
+          ref: gh-pages
+          path: ./public
       - name: Generate GitHub pages
         working-directory: ./main
         run: |
