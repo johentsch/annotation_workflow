@@ -11,11 +11,24 @@ import plotly.figure_factory as ff
 INDEX_FNAME = 'index.md'
 GANTT_FNAME = 'gantt.md'
 JEKYLL_CFG_FNAME = '_config.yml'
+STYLE_FNAME = 'assets/css/style.scss'
 
 INDEX_FILE = f"""
 * [Modulation plans]({GANTT_FNAME})
 """
+
 JEKYLL_CFG_FILE = "theme: jekyll-theme-tactile "
+
+STYLE_FILE = """---
+---
+
+@import "{{ site.theme }}";
+
+.inner {
+  max-width: 95%;
+  width: 1024px;
+}
+"""
 
 
 
@@ -152,6 +165,7 @@ def main(args):
     write_gantt_charts(args)
     write_to_file(args, INDEX_FNAME, INDEX_FILE)
     write_to_file(args, JEKYLL_CFG_FNAME, JEKYLL_CFG_FILE)
+    write_to_file(args, STYLE_FNAME, STYLE_FILE)
     write_gantt_file(args)
 
 
@@ -180,6 +194,7 @@ def write_gantt_charts(args):
 def write_to_file(args, filename, content_str):
     path = check_dir('.') if args.out is None else args.out
     fname = os.path.join(path, filename)
+    _ = check_and_create(os.path.dirname(fname)) # in case the file name included path components
     with open(fname, 'w', encoding='utf-8') as f:
         f.writelines(content_str)
 
