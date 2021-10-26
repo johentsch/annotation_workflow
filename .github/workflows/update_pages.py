@@ -8,6 +8,14 @@ from plotly.offline import plot
 import plotly.figure_factory as ff
 # import pandas as pd
 
+INDEX_FNAME = 'index.md'
+GANTT_FNAME = 'gantt.md'
+INDEX_FILE = f"""
+* [Modulation plans]({GANTT_FNAME})
+"""
+
+
+
 
 def create_gantt(d, task_column='Task', title='Gantt chart', lines=None, cadences=None):
     """Creates and returns ``fig`` and populates it with features.
@@ -140,6 +148,9 @@ def get_phraseends(at):
 
 def main(args):
     write_gantt_charts(args)
+    write_to_file(args, INDEX_FNAME, INDEX_FILE)
+    write_gantt_file(args)
+
 
 def write_gantt_charts(args):
     p = Parse(args.dir, paths=args.file, file_re=args.regex, exclude_re=args.exclude, recursive=args.nonrecursive, logger_cfg=dict(level=args.level))
@@ -161,6 +172,20 @@ def write_gantt_charts(args):
         out_path = os.path.join(gantt_path, f'{fname}.html')
         plot(fig, filename=out_path)
         logger.debug(f"Stored as {out_path}")
+
+
+def write_to_file(args, filename, content_str):
+    path = check_dir('.') if args.out is None else args.out
+    fname = os.path.join(path, filename)
+    with open(fname, 'w', encoding='utf-8') as f:
+        f.writelines(content_str)
+
+
+def write_gantt_file(args):
+    gantt_path = check_dir('gantt') if args.out is None else check_dir(os.path.join(args.out, 'gantt'))
+    fnames = sorted(os.listdir(gantt_path))
+    file_content = [f'<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="{os.path.join(gantt_path, f)}" height="600" width="100%"></iframe>' for f in fnames]
+    write_to_file(args, GANTT_FNAME, file_content)
 
 
 def test():
