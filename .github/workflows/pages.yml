@@ -39,6 +39,9 @@ jobs:
         working-directory: ./main
         run: |
           python .github/workflows/update_pages.py -f ${HOME}/files_modified.json -o ../public
+      - name: Display generated files
+        working-directory: ./public
+        run: ls
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
