@@ -184,7 +184,7 @@ def write_to_file(args, filename, content_str):
 def write_gantt_file(args):
     gantt_path = check_dir('gantt') if args.out is None else check_dir(os.path.join(args.out, 'gantt'))
     fnames = sorted(os.listdir(gantt_path))
-    file_content = [f'<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="{os.path.join(gantt_path, f)}" height="600" width="100%"></iframe>' for f in fnames]
+    file_content = '\n'.join(f'<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="gantt/{f}" height="600" width="100%"></iframe>' for f in fnames)
     write_to_file(args, GANTT_FNAME, file_content)
 
 
