@@ -158,7 +158,7 @@ def get_phraseends(at):
     if 'mn_fraction' not in at.columns:
         mn_fraction = at.mn + (at.mn_onset.astype(float)/at.timesig.map(frac).astype(float))
         at.insert(at.columns.get_loc('mn')+1, 'mn_fraction', mn_fraction)
-    return at.loc[at.phraseend.notna(), 'mn_fraction'].to_list()
+    return at.loc[at.phraseend.isin([r"\\", "}", "}{"]), 'mn_fraction'].to_list()
 
 
 def main(args):
