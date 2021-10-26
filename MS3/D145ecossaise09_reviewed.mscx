@@ -1016,6 +1016,12 @@
           <Harmony>
             <harmonyType>1</harmonyType>
             <name>G.I</name>
+            <color r="170" g="0" b="0" a="255"/>
+            </Harmony>
+          <Harmony>
+            <harmonyType>1</harmonyType>
+            <name>G.I{</name>
+            <color r="0" g="85" b="0" a="255"/>
             </Harmony>
           <Beam>
             <StemDirection>down</StemDirection>
@@ -1105,6 +1111,12 @@
           <Harmony>
             <harmonyType>1</harmonyType>
             <name>I</name>
+            <color r="170" g="0" b="0" a="255"/>
+            </Harmony>
+          <Harmony>
+            <harmonyType>1</harmonyType>
+            <name>I}</name>
+            <color r="0" g="85" b="0" a="255"/>
             </Harmony>
           <Chord>
             <BeamMode>mid</BeamMode>
@@ -1133,6 +1145,11 @@
         </Measure>
       <Measure>
         <voice>
+          <Harmony>
+            <harmonyType>1</harmonyType>
+            <name>{</name>
+            <color r="0" g="85" b="0" a="255"/>
+            </Harmony>
           <Beam>
             <StemDirection>down</StemDirection>
             </Beam>
@@ -1221,6 +1238,12 @@
           <Harmony>
             <harmonyType>1</harmonyType>
             <name>I</name>
+            <color r="170" g="0" b="0" a="255"/>
+            </Harmony>
+          <Harmony>
+            <harmonyType>1</harmonyType>
+            <name>I}</name>
+            <color r="0" g="85" b="0" a="255"/>
             </Harmony>
           <Chord>
             <BeamMode>mid</BeamMode>
@@ -1255,6 +1278,12 @@
           <Harmony>
             <harmonyType>1</harmonyType>
             <name>IV</name>
+            <color r="170" g="0" b="0" a="255"/>
+            </Harmony>
+          <Harmony>
+            <harmonyType>1</harmonyType>
+            <name>IV{</name>
+            <color r="0" g="85" b="0" a="255"/>
             </Harmony>
           <Beam>
             <StemDirection>down</StemDirection>
@@ -1360,6 +1389,12 @@
           <Harmony>
             <harmonyType>1</harmonyType>
             <name>I</name>
+            <color r="170" g="0" b="0" a="255"/>
+            </Harmony>
+          <Harmony>
+            <harmonyType>1</harmonyType>
+            <name>I}</name>
+            <color r="0" g="85" b="0" a="255"/>
             </Harmony>
           <Chord>
             <BeamMode>mid</BeamMode>
@@ -1394,6 +1429,12 @@
           <Harmony>
             <harmonyType>1</harmonyType>
             <name>IV</name>
+            <color r="170" g="0" b="0" a="255"/>
+            </Harmony>
+          <Harmony>
+            <harmonyType>1</harmonyType>
+            <name>IV{</name>
+            <color r="0" g="85" b="0" a="255"/>
             </Harmony>
           <Beam>
             <StemDirection>down</StemDirection>
@@ -1504,6 +1545,12 @@
           <Harmony>
             <harmonyType>1</harmonyType>
             <name>I</name>
+            <color r="170" g="0" b="0" a="255"/>
+            </Harmony>
+          <Harmony>
+            <harmonyType>1</harmonyType>
+            <name>I}</name>
+            <color r="0" g="85" b="0" a="255"/>
             </Harmony>
           <Chord>
             <durationType>eighth</durationType>
