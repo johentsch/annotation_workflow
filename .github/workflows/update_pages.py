@@ -74,7 +74,6 @@ def create_modulation_plan(data, task_column='semitones', sort_and_fill=True, ti
             data.fifths = transform(transposed, fifths2name)
         elif task_column == 'semitones':
             tonic = name2pc(globalkey)
-            print(data.semitones)
             transposed = data.semitones + tonic
             data.semitones = transform(transposed, midi2name)
 
