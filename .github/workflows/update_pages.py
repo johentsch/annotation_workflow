@@ -286,7 +286,7 @@ def write_gantt_charts(args):
         phrases = get_phraseends(at)
         data.sort_values(args.yaxis, ascending=False, inplace=True)
         logger.debug(f"Making and storing Gantt chart for {fname}...")
-        fig = create_modulation_plan(data, title=f"{fname}", globalkey=globalkey, task_column=args.yaxis, lines=phrases)
+        fig = create_modulation_plan(data, title=f"{fname}", globalkey=globalkey, task_column=args.yaxis, phraseends=phrases)
         out_path = os.path.join(gantt_path, f'{fname}.html')
         plot(fig, filename=out_path)
         logger.debug(f"Stored as {out_path}")
@@ -306,21 +306,6 @@ def write_gantt_file(args):
     file_content = '\n'.join(f'<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="gantt/{f}" height="600" width="100%"></iframe>' for f in fnames)
     write_to_file(args, GANTT_FNAME, file_content)
 
-
-def test():
-    p = Parse('/home/hentsche/annotation_workflow')
-    p.parse_mscx()
-    for (key, i, _), at in p.get_lists(expanded=True).items(): # at stands for annotation table, i.e. DataFrame of expanded labels
-        fname = p.fnames[key][i]
-        ID = (key, i)
-        metadata = p._parsed_mscx[ID].mscx.metadata
-        last_mn = metadata['last_mn']
-        globalkey = metadata['annotated_key']
-        data = make_gantt_data(at)
-        phrases = get_phraseends(at)
-        data.sort_values('semitones', ascending=False, inplace=True)
-        fig = create_gantt(data, title=f"{fname} ({globalkey})", task_column='semitones', phraseends=phrases)
-        print(plot(fig, filename=f'{fname}.html'))
 
 
 def check_and_create(d):
