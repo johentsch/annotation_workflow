@@ -3,7 +3,7 @@
 
 import argparse, os
 from fractions import Fraction as frac
-from ms3 import Parse, make_gantt_data, resolve_dir #transform, roman_numeral2fifths, roman_numeral2semitones, name2fifths, rel2abs_key, labels2global_tonic, resolve_relative_keys
+from ms3 import Parse, make_gantt_data, transform, fifths2name, midi2name, name2fifths, name2pc, resolve_dir #transform, roman_numeral2fifths, roman_numeral2semitones, name2fifths, rel2abs_key, labels2global_tonic, resolve_relative_keys
 from plotly.offline import plot
 import plotly.figure_factory as ff
 import pandas as pd
@@ -47,7 +47,7 @@ KEY_COLORS = {'applied':                            'rgb(228,26,28)',
 Y_AXIS = 'Tonicized keys'
 
 
-def create_modulation_plan(data, task_column='semitones', sort_and_fill=True, title='Modulation plan', phraseends=None, cadences=None, colors=None):
+def create_modulation_plan(data, task_column='semitones', sort_and_fill=True, title='Modulation plan', globalkey=None, phraseends=None, cadences=None, colors=None):
 
     if sort_and_fill:
         if task_column in ('semitones', 'fifths'):
@@ -65,6 +65,18 @@ def create_modulation_plan(data, task_column='semitones', sort_and_fill=True, ti
         else:
             # assuming task_column contains strings
             data = data.sort_values(task_column, ascending=False, key=lambda S: S.str.upper())
+
+    if globalkey is not None:
+        title += f" ({globalkey})"
+        if task_column == 'fifths':
+            tonic = name2fifths(globalkey)
+            transposed = data.fifths + tonic
+            data.fifths = transform(transposed, fifths2name)
+        elif task_column == 'semitones':
+            tonic = name2pc(globalkey)
+            print(data.semitones)
+            transposed = data.semitones + tonic
+            data.semitones = transform(transposed, midi2name)
 
     ytitle = Y_AXIS
     if task_column in ('semitones', 'fifths'):
