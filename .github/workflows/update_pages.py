@@ -286,7 +286,7 @@ def write_gantt_charts(args):
         phrases = get_phraseends(at)
         data.sort_values(args.yaxis, ascending=False, inplace=True)
         logger.debug(f"Making and storing Gantt chart for {fname}...")
-        fig = create_gantt(data, title=f"{fname} ({globalkey})", task_column=args.yaxis, lines=phrases)
+        fig = create_modulation_plan(data, title=f"{fname}", globalkey=globalkey, task_column=args.yaxis, lines=phrases)
         out_path = os.path.join(gantt_path, f'{fname}.html')
         plot(fig, filename=out_path)
         logger.debug(f"Stored as {out_path}")
@@ -319,7 +319,7 @@ def test():
         data = make_gantt_data(at)
         phrases = get_phraseends(at)
         data.sort_values('semitones', ascending=False, inplace=True)
-        fig = create_gantt(data, title=f"{fname} ({globalkey})", task_column='semitones', lines=phrases)
+        fig = create_gantt(data, title=f"{fname} ({globalkey})", task_column='semitones', phraseends=phrases)
         print(plot(fig, filename=f'{fname}.html'))
 
 
