@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.type != 'IssueCommentEvent' || github.event.issue.pull_request }}
     steps:
+      - name: Outputs
+        run: echo "${{ github.event.type }} ${{ github.event.type != 'IssueCommentEvent'}} ${{ github.event.issue.pull_request }}"
       - name: Set up Python 3.8
         uses: actions/setup-python@v1
         with:
