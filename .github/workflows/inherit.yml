@@ -21,4 +21,4 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
       - name: Copy assignees and tags from referenced issues
         run: |
-          python .github/workflows/pr_tags.py ${{ github.repository }} ${{ secrets.MS3_BOT_TOKEN }} -p ${{ github.event.pull_request.number }}
+          python .github/workflows/pr_tags.py ${{ github.repository }} ${{ secrets.PAC }} -p ${{ github.event.pull_request.number }}
