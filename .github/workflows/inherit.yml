@@ -11,13 +11,12 @@ on:
 jobs:
   inherit:
     runs-on: ubuntu-latest
-    if: ${{ github.event.type != 'IssueCommentEvent' || github.event.issue.pull_request }}
+    if: ${{ github.event_name != 'issue_comment' || github.event.issue.pull_request }}
     steps:
       - name: Outputs
         run: |
-          echo ${{ github.event.type }}
           echo ${{ github.event_name }}
-          echo ${{ github.event.type != 'IssueCommentEvent'}}
+          echo ${{ github.event_name != 'issue_comment' }}
           echo ${{ github.event.issue.pull_request }}
       - name: Set up Python 3.8
         uses: actions/setup-python@v1
