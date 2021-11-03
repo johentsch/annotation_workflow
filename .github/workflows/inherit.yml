@@ -15,9 +15,10 @@ jobs:
     steps:
       - name: Outputs
         run: |
-          echo ${{ github.event_name }}
-          echo ${{ github.event_name != 'issue_comment' }}
-          echo ${{ github.event.issue.pull_request }}
+          echo "event_name:" ${{ github.event_name }}
+          echo "is PR: " github.event.issue.pull_request
+          echo "sha: " ${{ github.event.pull_request.head.sha }}
+          echo "ref: " ${{ github.event.pull_request.head.ref }}
       - name: Set up Python 3.8
         uses: actions/setup-python@v1
         with:
@@ -33,4 +34,4 @@ jobs:
         run: echo ${{ github.event.type }}
       - name: Copy assignees and tags from referenced issues
         run: |
-          python .github/workflows/pr_tags.py ${{ github.repository }} ${{ secrets.PAC }} -p ${{ github.event.pull_request.number }} -s ${{ github.event.pull_request.head.sha }}
+          python .github/workflows/pr_tags.py ${{ github.repository }} ${{ secrets.PAC }} -p ${{ github.event.pull_request.number }}
