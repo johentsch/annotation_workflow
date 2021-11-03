@@ -7,4 +7,4 @@ jobs:
   test:
     steps:
       - name: Test
-        run: echo $ {{ ${{ github.event.issue.pull_request }} }}
+        run: echo ${{ github.event.issue.pull_request }}
