@@ -149,7 +149,7 @@
     <showUnprintable>1</showUnprintable>
     <showFrames>1</showFrames>
     <showMargins>0</showMargins>
-    <metaTag name="annotators">Annotator A</metaTag>
+    <metaTag name="annotators">JH</metaTag>
     <metaTag name="arranger"></metaTag>
     <metaTag name="composer">Franz Schubert</metaTag>
     <metaTag name="copyright"></metaTag>
@@ -1221,7 +1221,7 @@
             </TimeSig>
           <Harmony>
             <harmonyType>1</harmonyType>
-            <name>B.I</name>
+            <name>B.I{</name>
             </Harmony>
           <Beam>
             <StemDirection>down</StemDirection>
@@ -1452,7 +1452,7 @@
             </Rest>
           <Harmony>
             <harmonyType>1</harmonyType>
-            <name>I</name>
+            <name>I}</name>
             </Harmony>
           <Beam>
             <StemDirection>down</StemDirection>
@@ -1492,7 +1492,7 @@
             </BarLine>
           <Harmony>
             <harmonyType>1</harmonyType>
-            <name>V7/bII</name>
+            <name>V7/bII{</name>
             </Harmony>
           <Beam>
             <StemDirection>down</StemDirection>
@@ -1719,7 +1719,7 @@
             </Chord>
           <Harmony>
             <harmonyType>1</harmonyType>
-            <name>I</name>
+            <name>I}</name>
             </Harmony>
           <Chord>
             <BeamMode>mid</BeamMode>
