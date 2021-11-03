@@ -5,6 +5,7 @@ on: issue_comment
 
 jobs:
   test:
+    runs-on: ubuntu-latest
     steps:
       - name: Test
         run: echo ${{ github.event.issue.pull_request }}
