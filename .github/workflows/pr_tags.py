@@ -97,7 +97,10 @@ def find_pr_by_sha(repo, sha, state='open'):
 
 def find_referenced_issues(html):
     find_issues = r"/issues/(\d+)"
-    return set(re.findall(find_issues, html))
+    if isinstance(html, str):
+        return set(re.findall(find_issues, html))
+    else:
+        return set()
 
 def get_referenced_issues(repo, issue_number=None):
     issue = repo.issue(issue_number)
