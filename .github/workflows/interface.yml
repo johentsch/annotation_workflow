@@ -1,0 +1,23 @@
+name: Create DCML Corpus Interface initialization file.
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Store repository name (without owner) in the shell environment.
+        run: echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Generate .ini file contents.
+        # See https://github.com/DCMLab/corpusinterface#tldr.
+        run: |
+          printf "[${{github.repository_owner}}-${{env.REPOSITORY_NAME}}]\naccess: zip\nurl: https://github.com/${github.repository_owner}/${env.REPOSITORY_NAME}/archive/refs/heads/main.zip" > ${{env.REPOSITORY_NAME}}.ini
+
+      - name: Show .ini file content.
+        run: |
+          cat ${{env.REPOSITORY_NAME}}.ini
