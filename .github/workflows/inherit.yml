@@ -14,15 +14,11 @@ jobs:
     if: ${{ github.event.type != 'IssueCommentEvent' || github.event.issue.pull_request }}
     steps:
       - name: Outputs
-<<<<<<< HEAD
         run: |
           echo ${{ github.event.type }}
           echo ${{ github.event_name }}
           echo ${{ github.event.type != 'IssueCommentEvent'}}
           echo ${{ github.event.issue.pull_request }}
-=======
-        run: echo "${{ github.event.type }} ${{ github.event.type != 'IssueCommentEvent'}} ${{ github.event.issue.pull_request }}"
->>>>>>> bfb30275725dd320b91fe08083a0e094a83ddca2
       - name: Set up Python 3.8
         uses: actions/setup-python@v1
         with:
