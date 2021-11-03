@@ -1,4 +1,4 @@
-name: pages
+name: inherit
 
 on:
   pull_request:
