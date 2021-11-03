@@ -24,7 +24,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
       - name: Print event type
-        run: echo ${{ github.event }}
+        run: echo ${{ github.event.type }}
       - name: Copy assignees and tags from referenced issues
         run: |
           python .github/workflows/pr_tags.py ${{ github.repository }} ${{ secrets.PAC }} -p ${{ github.event.pull_request.number }}
