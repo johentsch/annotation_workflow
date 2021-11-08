@@ -37,4 +37,4 @@ jobs:
         run: echo ${{ github.event.type }}
       - name: Copy assignees and tags from referenced issues
         run: |
-          python .github/workflows/pr_tags.py ${{ github.repository }} ${{ secrets.PAC }} -p ${{ github.event.pull_request.number }}
+          python .github/workflows/pr_tags.py ${{ github.repository }} ${{ secrets.PAC }} -p ${{ github.event.pull_request.number || github.event.issue.number }}
