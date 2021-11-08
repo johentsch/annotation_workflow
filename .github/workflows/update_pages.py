@@ -1,25 +1,45 @@
 #!/usr/bin/env python
 # coding: utf-8
-
-import argparse, os
+import argparse
+import base64
+import io
+import os
 from fractions import Fraction as frac
-from ms3 import Parse, make_gantt_data, transform, fifths2name, midi2name, name2fifths, name2pc, resolve_dir #transform, roman_numeral2fifths, roman_numeral2semitones, name2fifths, rel2abs_key, labels2global_tonic, resolve_relative_keys
-from plotly.offline import plot
-import plotly.figure_factory as ff
+
+import corpusstats
 import pandas as pd
+import plotly.figure_factory as ff
+from ms3 import Parse, make_gantt_data, transform, fifths2name, midi2name, name2fifths, name2pc, resolve_dir
+from plotly.offline import plot
 
-################################################################################
-#                           FILE TEMPLATES
-################################################################################
+# import pandas as pd
 
-INDEX_FNAME = 'index.md'
-GANTT_FNAME = 'gantt.md'
-JEKYLL_CFG_FNAME = '_config.yml'
-STYLE_FNAME = 'assets/css/style.scss'
+INDEX_FNAME = "index.md"
+GANTT_FNAME = "gantt.md"
+STATS_FNAME = "stats.md"
+JEKYLL_CFG_FNAME = "_config.yml"
+STYLE_FNAME = "assets/css/style.scss"
 
 INDEX_FILE = f"""
 * [Modulation plans]({GANTT_FNAME})
+* [Corpus state]({STATS_FNAME})
 """
+
+
+def generate_stats_text(pie_string, table_string):
+    STATS_FILE = f"""
+# Corpus Status
+
+## Vital statistics
+
+{table_string}
+
+## Completion ratios
+
+{pie_string}
+"""
+    return STATS_FILE
+
 
 JEKYLL_CFG_FILE = "theme: jekyll-theme-tactile "
 
@@ -268,19 +288,33 @@ def main(args):
     write_to_file(args, JEKYLL_CFG_FNAME, JEKYLL_CFG_FILE)
     write_to_file(args, STYLE_FNAME, STYLE_FILE)
     write_gantt_file(args)
+    write_stats_file(args)
 
 
 def write_gantt_charts(args):
-    p = Parse(args.dir, paths=args.file, file_re=args.regex, exclude_re=args.exclude, recursive=args.nonrecursive, logger_cfg=dict(level=args.level))
+    p = Parse(
+        args.dir,
+        paths=args.file,
+        file_re=args.regex,
+        exclude_re=args.exclude,
+        recursive=args.nonrecursive,
+        logger_cfg=dict(level=args.level),
+    )
     p.parse_mscx()
-    gantt_path = check_and_create('gantt') if args.out is None else check_and_create(os.path.join(args.out, 'gantt'))
-    for (key, i, _), at in p.get_lists(expanded=True).items(): # at stands for annotation table, i.e. DataFrame of expanded labels
+    gantt_path = (
+        check_and_create("gantt")
+        if args.out is None
+        else check_and_create(os.path.join(args.out, "gantt"))
+    )
+    for (key, i, _), at in p.get_lists(
+        expanded=True
+    ).items():  # at stands for annotation table, i.e. DataFrame of expanded labels
         fname = p.fnames[key][i]
         score_obj = p._parsed_mscx[(key, i)]
         metadata = score_obj.mscx.metadata
         logger = score_obj.mscx.logger
-        last_mn = metadata['last_mn']
-        globalkey = metadata['annotated_key']
+        last_mn = metadata["last_mn"]
+        globalkey = metadata["annotated_key"]
         logger.debug(f"Creating Gantt data for {fname}...")
         data = make_gantt_data(at)
         phrases = get_phraseends(at)
@@ -293,18 +327,49 @@ def write_gantt_charts(args):
 
 
 def write_to_file(args, filename, content_str):
-    path = check_dir('.') if args.out is None else args.out
+    path = check_dir(".") if args.out is None else args.out
     fname = os.path.join(path, filename)
-    _ = check_and_create(os.path.dirname(fname)) # in case the file name included path components
-    with open(fname, 'w', encoding='utf-8') as f:
+    _ = check_and_create(
+        os.path.dirname(fname)
+    )  # in case the file name included path components
+    with open(fname, "w", encoding="utf-8") as f:
         f.writelines(content_str)
 
 
 def write_gantt_file(args):
-    gantt_path = check_dir('gantt') if args.out is None else check_dir(os.path.join(args.out, 'gantt'))
+    gantt_path = (
+        check_dir("gantt")
+        if args.out is None
+        else check_dir(os.path.join(args.out, "gantt"))
+    )
     fnames = sorted(os.listdir(gantt_path))
-    file_content = '\n'.join(f'<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="gantt/{f}" height="600" width="100%"></iframe>' for f in fnames)
+    file_content = "\n".join(
+        f'<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="gantt/{f}" height="600" width="100%"></iframe>'
+        for f in fnames
+    )
     write_to_file(args, GANTT_FNAME, file_content)
+
+
+def write_stats_file(args):
+    p = corpusstats.Provider()
+    pie_string = ""
+    pie_array = []
+    for s in p.tabular_stats:
+        plot = p.pie_chart(s)
+        img = io.BytesIO()
+        plot.savefig(img, format="png")
+        img.seek(0)
+        img = base64.encodebytes(img.getvalue()).decode("utf-8")
+        pie_array.append(
+            f'<div class="pie_container"><img class="pie" src="data:image/png;base64, {img}"/></div>'
+        )
+    pie_string = "".join(pie_array)
+
+    vital_stats = pd.DataFrame.from_dict(p.stats, orient="index")
+    vital_stats = vital_stats.iloc[0:6, 0:2]
+    vital_stats = vital_stats.to_markdown(index=False, headers=[])
+    full_text = generate_stats_text(pie_string, vital_stats)
+    write_to_file(args, STATS_FNAME, full_text)
 
 
 
@@ -323,34 +388,80 @@ def check_dir(d):
     if not os.path.isdir(d):
         d = resolve_dir(os.path.join(os.getcwd(), d))
         if not os.path.isdir(d):
-            raise argparse.ArgumentTypeError(d + ' needs to be an existing directory')
+            raise argparse.ArgumentTypeError(d + " needs to be an existing directory")
     return resolve_dir(d)
-
 
 
 ################################################################################
 #                           COMMANDLINE INTERFACE
 ################################################################################
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        description = '''\
+        description="""\
 ---------------------------------------------------------
 | Script for updating GitHub pages for a DCML subcorpus |
 ---------------------------------------------------------
 
 Description goes here
 
-''')
-    parser.add_argument('-d', '--dir', metavar='DIR', nargs='+', type=check_dir, help='Folder(s) that will be scanned for input files. Defaults to current working directory if no individual files are passed via -f.')
-    parser.add_argument('-n', '--nonrecursive', action='store_false', help="Don't scan folders recursively, i.e. parse only files in DIR.")
-    parser.add_argument('-f', '--file', metavar='PATHs', nargs='+', help='Add path(s) of individual file(s) to be checked.')
-    parser.add_argument('-r', '--regex', metavar="REGEX", default=r'\.mscx$', help="Select only file names including this string or regular expression. Defaults to MSCX files only.")
-    parser.add_argument('-e', '--exclude', metavar="regex", default=r'(^(\.|_)|_reviewed)', help="Any files or folders (and their subfolders) including this regex will be disregarded."
-                                     "By default, files including '_reviewed' or starting with . or _ are excluded.")
-    parser.add_argument('-o', '--out', metavar='OUT_DIR', type=check_and_create, help="""Output directory.""")
-    parser.add_argument('-y', '--yaxis', default='semitones', help="Ordering of keys on the y-axis: can be {semitones, fifths, numeral}.")
-    parser.add_argument('-l','--level',default='INFO',help="Set logging to one of the levels {DEBUG, INFO, WARNING, ERROR, CRITICAL}.")
+""",
+    )
+    parser.add_argument(
+        "-d",
+        "--dir",
+        metavar="DIR",
+        nargs="+",
+        type=check_dir,
+        help="Folder(s) that will be scanned for input files. Defaults to current working directory if no individual files are passed via -f.",
+    )
+    parser.add_argument(
+        "-n",
+        "--nonrecursive",
+        action="store_false",
+        help="Don't scan folders recursively, i.e. parse only files in DIR.",
+    )
+    parser.add_argument(
+        "-f",
+        "--file",
+        metavar="PATHs",
+        nargs="+",
+        help="Add path(s) of individual file(s) to be checked.",
+    )
+    parser.add_argument(
+        "-r",
+        "--regex",
+        metavar="REGEX",
+        default=r"\.mscx$",
+        help="Select only file names including this string or regular expression. Defaults to MSCX files only.",
+    )
+    parser.add_argument(
+        "-e",
+        "--exclude",
+        metavar="regex",
+        default=r"(^(\.|_)|_reviewed)",
+        help="Any files or folders (and their subfolders) including this regex will be disregarded."
+        "By default, files including '_reviewed' or starting with . or _ are excluded.",
+    )
+    parser.add_argument(
+        "-o",
+        "--out",
+        metavar="OUT_DIR",
+        type=check_and_create,
+        help="""Output directory.""",
+    )
+    parser.add_argument(
+        "-y",
+        "--yaxis",
+        default="semitones",
+        help="Ordering of keys on the y-axis: can be {semitones, fifths, numeral}.",
+    )
+    parser.add_argument(
+        "-l",
+        "--level",
+        default="INFO",
+        help="Set logging to one of the levels {DEBUG, INFO, WARNING, ERROR, CRITICAL}.",
+    )
     args = parser.parse_args()
     # logging_levels = {
     #     'DEBUG':    logging.DEBUG,
