@@ -108,7 +108,10 @@ def get_referenced_issues(repo, issue_number=None):
     referenced_issues.update(find_referenced_issues(issue.body_html))
     for comment in issue.comments():
         referenced_issues.update(find_referenced_issues(comment.body_html))
-    print(f"Issue #{issue_number} refers to {', '.join(f'#{i}' for i in referenced_issues)}")
+    if len(referenced_issues) > 0:
+        print(f"Issue #{issue_number} refers to {', '.join(f'#{i}' for i in referenced_issues)}")
+    else:
+        print("Nothing to do.")
     return referenced_issues
 
 
