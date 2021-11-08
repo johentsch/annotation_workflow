@@ -215,11 +215,11 @@ def get_phraseends(at):
 
 
 def main(args):
-    # write_gantt_charts(args)
+    write_gantt_charts(args)
     write_to_file(args, INDEX_FNAME, INDEX_FILE)
     write_to_file(args, JEKYLL_CFG_FNAME, JEKYLL_CFG_FILE)
     write_to_file(args, STYLE_FNAME, STYLE_FILE)
-    # write_gantt_file(args)
+    write_gantt_file(args)
     write_stats_file(args)
 
 
