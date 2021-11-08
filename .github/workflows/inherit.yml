@@ -14,7 +14,10 @@ jobs:
     if: ${{ github.event_name != 'issue_comment' || github.event.issue.pull_request }}
     steps:
       - name: Outputs
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
+          echo "$GITHUB_CONTEXT"
           echo "event_name:" ${{ github.event_name }}
           echo "is PR: " ${{ github.event.issue.pull_request }}
           echo "sha: " ${{ github.event.pull_request.head.sha }}
