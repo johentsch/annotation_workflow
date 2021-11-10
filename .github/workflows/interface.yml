@@ -16,7 +16,7 @@ jobs:
       - name: Generate .ini file contents.
         # See https://github.com/DCMLab/corpusinterface#tldr.
         run: |
-        printf "[${{github.repository_owner}}-${{env.REPOSITORY_NAME}}]\naccess: zip\nurl: https://github.com/${github.repository_owner}/${env.REPOSITORY_NAME}/archive/refs/heads/main.zip\n" > ${{env.REPOSITORY_NAME}}.ini && \
+          printf "[${{github.repository_owner}}-${{env.REPOSITORY_NAME}}]\naccess: zip\nurl: https://github.com/${github.repository_owner}/${env.REPOSITORY_NAME}/archive/refs/heads/main.zip\n" > ${{env.REPOSITORY_NAME}}.ini && \
 git config -f .gitmodules -l | awk '{split($0, a, /=/); split(a[1], b, /\./); if (b[3]=="url") {print "["b[2]"]\naccess: git\nurl: "a[2]}}'\ >> ${{env.REPOSITORY_NAME}}.ini
       - name: Show .ini file content.
         run: |
