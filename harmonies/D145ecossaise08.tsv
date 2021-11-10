@@ -1,0 +1,13 @@
+mc	mn	mc_onset	mn_onset	timesig	staff	voice	volta	label	globalkey	localkey	pedal	chord	numeral	form	figbass	changes	relativeroot	cadence	phraseend	chord_type	globalkey_is_minor	localkey_is_minor	chord_tones	added_tones	root	bass_note
+1	1	0	0	2/4	2	1		B.i[i{	B	I	i	i	i						{	m	0	0	0, -3, 1		0	0
+2	2	0	0	2/4	2	1		V	B	I	i	V	V							M	0	0	1, 5, 2		1	1
+2	2	1/4	1/4	2/4	2	1		i	B	I	i	i	i							m	0	0	0, -3, 1		0	0
+4	4	0	0	2/4	2	1		V	B	I	i	V	V							M	0	0	1, 5, 2		1	1
+4	4	1/4	1/4	2/4	2	1		i]}	B	I	i	i	i						}	m	0	0	0, -3, 1		0	0
+5	5	0	0	2/4	2	1		III.I{	B	III		I	I						{	M	0	0	0, 4, 1		0	0
+5	5	1/4	1/4	2/4	2	1		I6	B	III		I6	I		6					M	0	0	4, 1, 0		0	4
+6	6	0	0	2/4	2	1		V	B	III		V	V							M	0	0	1, 5, 2		1	1
+7	7	0	0	2/4	2	1		I	B	III		I	I							M	0	0	0, 4, 1		0	0
+7	7	1/4	1/4	2/4	2	1		I6	B	III		I6	I		6					M	0	0	4, 1, 0		0	4
+8	8	0	0	2/4	2	1		V	B	III		V	V							M	0	0	1, 5, 2		1	1
+8	8	1/4	1/4	2/4	2	1		I}	B	III		I	I						}	M	0	0	0, 4, 1		0	0
