@@ -27,6 +27,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e ./ms3
+      - name: Clone corpusstats
+        uses: actions/checkout@v2
+        with:
+          repository: DCMLab/corpus_statistics_generator
+          path: ./corpusstats
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install corpusstats
+        run: python -m pip install -e ./corpusstats
       - name: Install dependencies
         run: |
           python -m pip install plotly
