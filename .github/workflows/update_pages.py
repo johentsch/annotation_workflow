@@ -300,7 +300,7 @@ def write_stats_file(args):
     pie_string = "".join(pie_array)
 
     vital_stats = pd.DataFrame.from_dict(p.stats, orient="index")
-    vital_stats = vital_stats.iloc[0:6, 0:2]
+    vital_stats = vital_stats.iloc[0:12, 0:2]
     vital_stats = vital_stats.to_markdown(index=False, headers=[])
     full_text = generate_stats_text(pie_string, vital_stats)
     write_to_file(args, STATS_FNAME, full_text)
