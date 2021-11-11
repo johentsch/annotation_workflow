@@ -9,8 +9,7 @@ from fractions import Fraction as frac
 import corpusstats
 import pandas as pd
 import plotly.figure_factory as ff
-from ms3 import (  # transform, roman_numeral2fifths, roman_numeral2semitones, name2fifths, rel2abs_key, labels2global_tonic, resolve_relative_keys
-    Parse, make_gantt_data, resolve_dir)
+from ms3 import Parse, make_gantt_data, transform, fifths2name, midi2name, name2fifths, name2pc, resolve_dir
 from plotly.offline import plot
 
 # import pandas as pd
@@ -56,22 +55,167 @@ STYLE_FILE = """---
 """
 
 
-def create_gantt(d, task_column="Task", title="Gantt chart", lines=None, cadences=None):
+################################################################################
+#                          STYLING GANTT CHARTS
+################################################################################
+
+
+PHRASEEND_LINES = {'color':'rgb(0, 0, 0)','width': 0.2,'dash': 'longdash'}
+KEY_COLORS = {'applied':                            'rgb(228,26,28)',
+              'local':                              'rgb(55,126,184)',
+              'tonic of adjacent applied chord(s)': 'rgb(77,175,74)'}
+Y_AXIS = 'Tonicized keys'
+
+
+def create_modulation_plan(data, task_column='semitones', sort_and_fill=True, title='Modulation plan', globalkey=None, phraseends=None, cadences=None, colors=None):
+
+    if sort_and_fill:
+        if task_column in ('semitones', 'fifths'):
+            mi, ma = data[task_column].min(), data[task_column].max()
+            mi = min((0, mi)) # fifths can be negative
+            complete = set(range(mi, ma))
+            missing = complete.difference(set(data[task_column]))
+            missing_data = pd.DataFrame.from_records([{'Start': 0,
+                                                       'Finish': 0,
+                                                       'Resource': 'local',
+                                                       task_column: m
+                                                       }
+                                                       for m in missing])
+            data = pd.concat([data, missing_data]).sort_values(task_column, ascending=False)
+        else:
+            # assuming task_column contains strings
+            data = data.sort_values(task_column, ascending=False, key=lambda S: S.str.upper())
+
+    if globalkey is not None:
+        title += f" ({globalkey})"
+        if task_column == 'fifths':
+            tonic = name2fifths(globalkey)
+            transposed = data.fifths + tonic
+            data.fifths = transform(transposed, fifths2name)
+        elif task_column == 'semitones':
+            tonic = name2pc(globalkey)
+            transposed = data.semitones + tonic
+            data.semitones = transform(transposed, midi2name)
+
+    ytitle = Y_AXIS
+    if task_column in ('semitones', 'fifths'):
+        ytitle += f" ({task_column})"
+
+
+    layout = dict(
+        xaxis = {'type': None, 'title': 'Measures'},
+        yaxis = {'title': ytitle}
+    )
+
+    if colors is None:
+        colors = KEY_COLORS
+
+    shapes = None
+    if phraseends is not None:
+        shapes = [dict(type = 'line',
+                       x0 = position,
+                       y0 = 0,
+                       x1 = position,
+                       y1 = 20,
+                       line = PHRASEEND_LINES)
+                  for position in phraseends]
+
+    #### Old code that needs updating if cadences are to be displayed:
+    #### It should append the created lines to the shapes list and the
+    #### function create_gantt needs to be expanded for hover items
+    # if cadences is not None:
+    #     lines = []
+    #     annos = []
+    #     hover_x = []
+    #     hover_y = []
+    #     hover_text = []
+    #     alt = 0
+    #     for i,r in cadences.iterrows():
+    #         m = r.m
+    #         c = r.type
+    #         try:
+    #             key = r.key
+    #         except:
+    #             key = None
+    #
+    #         if c == 'PAC':
+    #             c = 'PC'
+    #             w = 1
+    #             d = 'solid'
+    #         elif c == 'IAC':
+    #             c = 'IC'
+    #             w = 0.5
+    #             d = 'solid'
+    #         elif c == 'HC':
+    #             w = 0.5
+    #             d = 'dash'
+    #         elif c in ('EVCAD', 'EC'):
+    #             c = 'EC'
+    #             w = 0.5
+    #             d = 'dashdot'
+    #         elif c in ('DEC', 'DC'):
+    #             c = 'DC'
+    #             w = 0.5
+    #             d = 'dot'
+    #         else:
+    #             print(f"{r.m}: Cadence type {c} unknown.")
+    #         #c = c + f"<br>{key}"
+    #         linestyle = {'color':'rgb(55, 128, 191)','width': w,'dash':d}
+    #         annos.append({'x':m,'y':-0.01+alt*0.03,'font':{'size':7},'showarrow':False,'text':c,'xref':'x','yref':'paper'})
+    #         lines.append({'type': 'line','x0':m,'y0':0,'x1':m,'y1':20,'line':linestyle})
+    #         alt = 0 if alt else 1
+    #         hover_x.append(m)
+    #         hover_y.append(-0.5 - alt * 0.5)
+    #         text = "Cad: " + r.type
+    #         if key is not None:
+    #             text += "<br>Key: " + key
+    #         text += "<br>Beat: " + str(r.beat)
+    #         hover_text.append(text)
+    #### The following dictionary represents a new trace that can be added to the
+    #### Gantt chart using fig.add_traces([hover_trace])
+    # hover_trace=dict(type='scatter',opacity=0,
+    #                 x=hover_x,
+    #                 y=hover_y,
+    #                 marker= dict(size= 14,
+    #                             line= dict(width=1),
+    #                             color= 'red',
+    #                             opacity= 0.3),
+    #                 name= "Cadences",
+    #                 text= hover_text)
+
+    return create_gantt(data, task_column=task_column, title=title, colors=colors, layout=layout, shapes=shapes)
+
+
+def create_gantt(data, task_column='Task', title='Gantt chart', colors=None, layout=None, shapes=None, annotations=None, **kwargs):
     """Creates and returns ``fig`` and populates it with features.
 
-    When plotted with plot() or iplot(), ``fig`` shows a Gantt chart representing
-    the piece's tonalities as extracted by the class Keys().
+    When plotted with plot() or iplot(), ``fig`` shows a Gantt chart.
 
     Parameters
     ----------
-    d: pd.Dataframe
+    data: :obj:`pandas.DataFrame`
         DataFrame with at least the columns ['Start', 'Finish', 'Task', 'Resource'].
         Other columns can be selected as 'Task' by passing ``task_column``.
         Further possible columns: 'Description'
-    task_column : str
-        If ``d`` doesn't have a 'Task' column, pass the name of the column that you want to use as such.
-    title: str
+    task_column : :obj:`str`, optional
+        If ``data`` doesn't have a 'Task' column, pass the name of the column that you want to use as such.
+    title: :obj:`str`, optional
         Title to be plotted
+    colors : :obj:`dict` or :obj:`str`, optional
+        Either a dictionary mapping all occurring values of index_col (default column 'Resource')
+        to a color, or the name of the column containing colors. For more options, check out
+        :py:meth:`plotly.figure_factory.create_gantt`
+    layout : :obj:`dict`
+        {key -> dict} which will iteratively update like this: fig['layout'][key].update(dict)
+    shapes : :obj:`list` of :obj:`dict`
+        One dict per shape that is to be added to the Gantt chart. Dicts typically have the keys
+        'type', 'x0', 'y0', 'x1', 'y1', and another keyword for styling the shape.
+    annotations : :obj:`list` of :obj:`dict`
+        One dict per text annotation that is to be added to the Gantt chart. Dicts typically have the keys
+        'x', 'y', 'text', 'font', 'showarrow', 'xref', 'yref'
+
+
+    **kwargs : Keyword arguments for :py:meth:`plotly.figure_factory.create_gantt`
 
     Examples
     --------
@@ -88,138 +232,62 @@ def create_gantt(d, task_column="Task", title="Gantt chart", lines=None, cadence
     >>> plot(fig,filename="filename.html")
     """
 
-    colors = {
-        "applied": "rgb(228,26,28)",  # 'rgb(220, 0, 0)',
-        "local": "rgb(55,126,184)",  # (1, 0.9, 0.16),
-        "tonic of adjacent applied chord(s)": "rgb(77,175,74)",
-    }  # 'rgb(0, 255, 100)'}
-    # 'Bluered', 'Picnic', 'Viridis', 'Rainbow'
+    if task_column != 'Task':
+        data = data.rename(columns={task_column: 'Task'})
 
-    if task_column != "Task":
-        d = d.rename(columns={task_column: "Task"})
-
-    fig = ff.create_gantt(
-        d,
-        colors=colors,
+    params = dict(
         group_tasks=True,
-        index_col="Resource",
+        index_col='Resource',
         show_colorbar=True,
         showgrid_x=True,
         showgrid_y=True,
-        title=title,
     )
+    params.update(kwargs)
 
-    fig["layout"]["xaxis"].update({"type": None, "title": "Measures"})
-    fig["layout"]["yaxis"].update({"title": "Tonicized keys"})
+    fig = ff.create_gantt(data, colors=colors, title=title, **params)
 
-    if lines is not None:
-        linestyle = {"color": "rgb(0, 0, 0)", "width": 0.2, "dash": "longdash"}
-        lines = [
-            {
-                "type": "line",
-                "x0": position,
-                "y0": 0,
-                "x1": position,
-                "y1": 20,
-                "line": linestyle,
-            }
-            for position in lines
-        ]
-        fig["layout"]["shapes"] = fig["layout"]["shapes"] + tuple(lines)
+    # prevent Plotly from interpreting positions as dates
+    default_layout = dict(xaxis = {'type': None})
+    if layout is not None:
+        default_layout.update(layout)
 
-    if cadences is not None:
-        lines = []
-        annos = []
-        hover_x = []
-        hover_y = []
-        hover_text = []
-        alt = 0
-        for i, r in cadences.iterrows():
-            m = r.m
-            c = r.type
-            try:
-                key = r.key
-            except:
-                key = None
+    # if layout is None:
+    #     layout = {}
+    # if 'xaxis' not in layout:
+    #     layout['xaxis'] = {}
+    # if 'type' not in layout['xaxis']:
+    #     layout['xaxis']['type'] = None
 
-            if c == "PAC":
-                c = "PC"
-                w = 1
-                d = "solid"
-            elif c == "IAC":
-                c = "IC"
-                w = 0.5
-                d = "solid"
-            elif c == "HC":
-                w = 0.5
-                d = "dash"
-            elif c == "EVCAD":
-                c = "EC"
-                w = 0.5
-                d = "dashdot"
-            elif c == "DEC":
-                c = "DC"
-                w = 0.5
-                d = "dot"
-            else:
-                print(f"{c}: Kadenztyp nicht vorgesehen")
-            # c = c + f"<br>{key}"
-            linestyle = {"color": "rgb(55, 128, 191)", "width": w, "dash": d}
-            annos.append(
-                {
-                    "x": m,
-                    "y": -0.01 + alt * 0.03,
-                    "font": {"size": 7},
-                    "showarrow": False,
-                    "text": c,
-                    "xref": "x",
-                    "yref": "paper",
-                }
-            )
-            lines.append(
-                {"type": "line", "x0": m, "y0": 0, "x1": m, "y1": 20, "line": linestyle}
-            )
-            alt = 0 if alt else 1
-            hover_x.append(m)
-            hover_y.append(-0.5 - alt * 0.5)
-            text = "Cad: " + r.type
-            if key is not None:
-                text += "<br>Key: " + key
-            text += "<br>Beat: " + str(r.beat)
-            hover_text.append(text)
+    for key, dictionary in default_layout.items():
+        fig['layout'][key].update(dictionary)
 
-        fig["layout"]["shapes"] = fig["layout"]["shapes"] + tuple(lines)
-        fig["layout"]["annotations"] = annos
 
-        hover_trace = dict(
-            type="scatter",
-            opacity=0,
-            x=hover_x,
-            y=hover_y,
-            marker=dict(size=14, line=dict(width=1), color="red", opacity=0.3),
-            name="Cadences",
-            text=hover_text,
-        )
-        # fig['data'].append(hover_trace)
-        fig.add_traces([hover_trace])
+    if shapes is not None:
+        fig['layout']['shapes'] = fig['layout']['shapes'] + tuple(shapes)
+
+    if annotations is not None:
+        fig['layout']['annotations'] = annotations
+
+    #fig['data'].append(hover_trace)     ### older
+    #fig.add_traces([hover_trace])       ### newer
     return fig
 
 
-def get_phraseends(at):
-    if "mn_fraction" not in at.columns:
-        mn_fraction = at.mn + (
-            at.mn_onset.astype(float) / at.timesig.map(frac).astype(float)
-        )
-        at.insert(at.columns.get_loc("mn") + 1, "mn_fraction", mn_fraction)
-    return at.loc[at.phraseend.isin([r"\\", "}", "}{"]), "mn_fraction"].to_list()
+def get_phraseends(at, column='mn_fraction'):
+    """ If make_gantt_data() returned quarterbeats positions, pass column='quarterbeats'
+    """
+    if column == 'mn_fraction' and 'mn_fraction' not in at.columns:
+        mn_fraction = at.mn + (at.mn_onset.astype(float)/at.timesig.map(frac).astype(float))
+        at.insert(at.columns.get_loc('mn')+1, 'mn_fraction', mn_fraction)
+    return at.loc[at.phraseend.isin([r"\\", "}", "}{"]), column].to_list()
 
 
 def main(args):
-    # write_gantt_charts(args)
+    write_gantt_charts(args)
     write_to_file(args, INDEX_FNAME, INDEX_FILE)
     write_to_file(args, JEKYLL_CFG_FNAME, JEKYLL_CFG_FILE)
     write_to_file(args, STYLE_FNAME, STYLE_FILE)
-    # write_gantt_file(args)
+    write_gantt_file(args)
     write_stats_file(args)
 
 
@@ -252,10 +320,8 @@ def write_gantt_charts(args):
         phrases = get_phraseends(at)
         data.sort_values(args.yaxis, ascending=False, inplace=True)
         logger.debug(f"Making and storing Gantt chart for {fname}...")
-        fig = create_gantt(
-            data, title=f"{fname} ({globalkey})", task_column=args.yaxis, lines=phrases
-        )
-        out_path = os.path.join(gantt_path, f"{fname}.html")
+        fig = create_modulation_plan(data, title=f"{fname}", globalkey=globalkey, task_column=args.yaxis, phraseends=phrases)
+        out_path = os.path.join(gantt_path, f'{fname}.html')
         plot(fig, filename=out_path)
         logger.debug(f"Stored as {out_path}")
 
@@ -305,25 +371,6 @@ def write_stats_file(args):
     full_text = generate_stats_text(pie_string, vital_stats)
     write_to_file(args, STATS_FNAME, full_text)
 
-
-def test():
-    p = Parse("/home/hentsche/annotation_workflow")
-    p.parse_mscx()
-    for (key, i, _), at in p.get_lists(
-        expanded=True
-    ).items():  # at stands for annotation table, i.e. DataFrame of expanded labels
-        fname = p.fnames[key][i]
-        ID = (key, i)
-        metadata = p._parsed_mscx[ID].mscx.metadata
-        last_mn = metadata["last_mn"]
-        globalkey = metadata["annotated_key"]
-        data = make_gantt_data(at)
-        phrases = get_phraseends(at)
-        data.sort_values("semitones", ascending=False, inplace=True)
-        fig = create_gantt(
-            data, title=f"{fname} ({globalkey})", task_column="semitones", lines=phrases
-        )
-        print(plot(fig, filename=f"{fname}.html"))
 
 
 def check_and_create(d):
