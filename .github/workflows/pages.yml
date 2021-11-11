@@ -45,6 +45,7 @@ jobs:
         run: cat ${HOME}/files_modified.json
       - name: Copy existing page
         uses: actions/checkout@v2
+        continue-on-error: true
         with:
           ref: gh-pages
           path: ./public
